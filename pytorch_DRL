@@ -339,7 +339,9 @@ class DQNAgent:
         loss.backward()
         self.optimizer.step()
 
-
+    def soft_update(self, tau):
+        for target_param, local_param in zip(self.Q_target.parameters(), self.Q_local.parameters()):
+            target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
 
 env = env('testA_testB_predicted.pdb', 'testA_testB_rl.pdb')
 #env = env('/home/esdft/DeepRLP/data/3HE4A_3HE4B.pdb', '/home/esdft/DeepRLP/data/3HE4A_3HE4B_GD.pdb')
@@ -442,7 +444,7 @@ def sample_batch(exp_replay, batch_size):
 test = sample_batch(exp_replay, batch_size=12)
 
 agent.learn(test)
-
+agent.soft_update(0.01)
 
 
 print("test")
